@@ -13,12 +13,6 @@ import evaluate
 import numpy as np
 
 
-
-
-
-
-
-
 imbd = load_dataset("imbd")
 tokenizer = AutoTokenizer.from_pretrained("distilbert/distilbert-base-uncased")
 
