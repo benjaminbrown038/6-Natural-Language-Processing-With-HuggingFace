@@ -7,6 +7,8 @@ from transformers import DataCollatorWithPadding
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 from transformers import create_optimizer
 from transformers import TFAutoModelForSequenceClassification
+from transformers import create_optimizer
+import tensorflow as tf
 import evaluate
 import numpy as np
 
@@ -14,15 +16,14 @@ import numpy as np
 
 
 
-notebook_login()
+
 
 
 imbd = load_dataset("imbd")
 imbd["test"][0]
 tokenizer = AutoTokenizer.from_pretrained("distilbert/distilbert-base-uncased")
 
-def preprocess_function(examples):
-    return tokenizer(examples["text"], truncation=True)
+
 
 tokenized_imdb = imdb.map(preprocess_function, batched=True)
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -50,8 +51,7 @@ training_args = TrainingArguments(
     eval_strategy="epoch",
     save_strategy="epoch",
     load_best_model_at_end=True,
-    push_to_hub=True,
-)
+    push_to_hub=True)
 
 trainer = Trainer(
     model=model,
@@ -60,15 +60,11 @@ trainer = Trainer(
     eval_dataset=tokenized_imdb["test"],
     processing_class=tokenizer,
     data_collator=data_collator,
-    compute_metrics=compute_metrics,
-)
+    compute_metrics=compute_metrics)
 
-trainer.train()
 
-trainer.push_to_hub()
 
-from transformers import create_optimizer
-import tensorflow as tf
+
 
 batch_size = 16
 num_epochs = 5
